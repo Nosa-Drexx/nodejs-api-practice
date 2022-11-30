@@ -90,4 +90,9 @@ router.delete(
   (req, res) => {}
 );
 
+router.use((err, res, req, next) => {
+  console.log(err);
+  res.json({ message: "in router handler" });
+}); //error handling for sub routers.
+
 export default router;

@@ -18,7 +18,10 @@ app.use(express.urlencoded({ extended: true })); // allows client to add things 
 //   next();
 // }); //personal middleware
 
-app.get("/", (req, res) => {
+app.get("/", (req, res, next) => {
+  setTimeout(() => {
+    next(new Error("hello")); //async error handling in express.
+  }, 1);
   console.log("hello from express");
   res.status(200);
   res.json({ message: "hello" });
@@ -29,5 +32,18 @@ app.use("/api", protect, router);
 app.post("/user", createNewUser);
 
 app.post("/signin", signin);
+
+app.use((err, req, res, next) => {
+  if (err.type === "auth") {
+    res.status(401);
+    res.json({ message: "unauthorized" });
+  } else if (err.type === "input") {
+    res.status(400);
+    res.json({ message: "invalid input" });
+  } else {
+    res.status(500);
+    res.json({ message: "That's on us" });
+  }
+}); // error handlers has a to be at the bottom of all your route so that express can bubble your error up to it.
 
 export default app;
